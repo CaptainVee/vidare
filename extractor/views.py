@@ -2,14 +2,16 @@ from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework import status
+import os
 
-from .models import UploadedFile
-from .serializers import UploadedFileSerializer
+from .models import ExtractedInfo , UploadedFile
+from .serializers import UploadedFileSerializer, ExtractedInfoSerializer
+from .utils import parse_pdf, parse_pptx
 
 class FileUploadView(APIView):
     parser_class = (FileUploadParser,)
 
-    def post(self, request, format=None):
+    def post(self, request):
         file_serializer = UploadedFileSerializer(data=request.data)
 
         if file_serializer.is_valid():
@@ -20,4 +22,21 @@ class FileUploadView(APIView):
 
 
 class ParsePitchDeckView(APIView):
-    pass
+    serializer_class = ExtractedInfoSerializer
+
+    def get(self, request, pk):
+        file = UploadedFile.objects.get(pk=pk)
+        file_path = file.file.name
+        file_extension = os.path.splitext(file_path)[1].lower()
+
+        if file_extension == '.pdf':
+            extracted_text = parse_pdf(file_path)
+        elif file_extension == '.pptx':
+            extracted_text = parse_pptx(file_path)
+        else:
+            raise ValueError("Unsupported file format")
+
+        file = UploadedFile.objects.get(file=file_path)
+        extracted_info = ExtractedInfo.objects.create(file=file, content=extracted_text)
+        serializer = self.serializer_class(extracted_info)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

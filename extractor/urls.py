@@ -3,5 +3,5 @@ from .views import FileUploadView, ParsePitchDeckView
 
 urlpatterns = [
     path('upload/', FileUploadView.as_view(), name='file-upload'),
-    path('parse/', ParsePitchDeckView.as_view(), name='parse-pitch-deck'),
+    path('parse/<int:pk>/', ParsePitchDeckView.as_view(), name='parse-pitch-deck'),
 ]

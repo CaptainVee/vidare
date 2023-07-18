@@ -3,15 +3,15 @@ import os
 import PyPDF2
 from pptx import Presentation
 
-def parse_pitch_deck(file_path):
-    file_extension = os.path.splitext(file_path)[1].lower()
+# def parse_pitch_deck(file_path):
+#     file_extension = os.path.splitext(file_path)[1].lower()
 
-    if file_extension == '.pdf':
-        return parse_pdf(file_path)
-    elif file_extension == '.pptx':
-        return parse_pptx(file_path)
-    else:
-        raise ValueError("Unsupported file format")
+#     if file_extension == '.pdf':
+#         return parse_pdf(file_path)
+#     elif file_extension == '.pptx':
+#         return parse_pptx(file_path)
+#     else:
+#         raise ValueError("Unsupported file format")
 
 def parse_pdf(file_path):
     extracted_text = ''
