@@ -1,0 +1,55 @@
+{% extends "extractor/base.html" %}
+{% block content %}
+
+<div class="container">
+	<div class="row">
+
+		<main class="col">
+
+			<div class="row">
+				<div class="col-sm-4 mb-3">
+					<div class="card bg-info">
+						<div class="card-body">
+							<h5 class="card-title">Word count</h5>
+							<p class="card-text">${{ total_revenue|floatformat:"-2g" }}</p>
+							<!-- <strong><small class="text-success">$300</small> this month</strong> -->
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4 mb-3">
+					<div class="card bg-success">
+						<div class="card-body">
+							<h5 class="card-title">File size</h5>
+							<p class="card-text">{{total_enrollment}}</p>
+							<!-- <strong><small class="text-bg-dark">100</small> this month</strong> -->
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4 mb-3">
+					<div class="card bg-danger">
+						<div class="card-body">
+							<h5 class="card-title">Categorry</h5>
+							<div class="rating mb-2">
+								<span class="average-rating">({{avg_rating}})</span>
+								<span class="average-stars">
+									<i class="fas fa-star"></i>
+									<i class="fas fa-star"></i>
+									<i class="fas fa-star"></i>
+									<i class="fas fa-star-half-alt"></i>
+								</span>
+								<span class="reviews">(Reviews)</span>
+							</div>
+							<!-- <strong><small class="text-bg-dark">100</small> this month</strong> -->
+						</div>
+					</div>
+				</div>
+
+				<h2 class="pt-3 pb-2 mb-3 border-bottom">File Content</h2>
+				<div class="container">
+					<!-- course header start -->
+                    {{ file.content }}
+				</div>
+		</main>
+	</div>
+</div>
+{% endblock content %}
