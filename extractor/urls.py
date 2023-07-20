@@ -1,9 +1,8 @@
 from django.urls import path
-from .views import FileUploadView, ParsePitchDeckAPIView, ParsePitchDeckView, ParsePitchDeckDetailView
+from .views import FileUploadView, dashboard
 
 urlpatterns = [
-    path('upload/', FileUploadView.as_view(), name='file-upload'),
-    path('', ParsePitchDeckView.as_view(), name='file-uploads'),
-    path('file/<int:pk>/', ParsePitchDeckDetailView.as_view(), name='file-upload-details'),
-    path('parse/<int:pk>/', ParsePitchDeckAPIView.as_view(), name='parse-pitch-deck'),
+    path('api/upload/', FileUploadView.as_view(), name='file-upload'),
+    path('', dashboard, name='file-uploads'),
+    path('dashboard/<int:pk>/', dashboard, name='dashboard2'),
 ]

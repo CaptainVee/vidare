@@ -8,50 +8,57 @@ from django.views.generic import ListView, DetailView
 from .models import ExtractedInfo, UploadedFile
 from .serializers import UploadedFileSerializer, ExtractedInfoSerializer
 from .utils import parse_pdf, parse_pptx
+import requests
+from django.shortcuts import render
+from .forms import FileUploadForm
 
 
 class FileUploadView(APIView):
     parser_class = (FileUploadParser,)
 
     def post(self, request):
-        file_serializer = UploadedFileSerializer(data=request.data)
+        file_serializer = UploadedFileSerializer(data=request.FILES)
 
         if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+            file = file_serializer.save()
+            file_path = file.file.name
+            file_extension = os.path.splitext(file_path)[1].lower()
+
+            if file_extension == ".pdf":
+                extracted_text = parse_pdf(file_path)
+            elif file_extension == ".pptx":
+                extracted_text = parse_pptx(file_path)
+            else:
+                raise ValueError("Unsupported file format")
+
+            extracted_info = ExtractedInfo.objects.create(
+                file=file, content=extracted_text
+            )
+            serializer = ExtractedInfoSerializer(extracted_info)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ParsePitchDeckAPIView(APIView):
-    serializer_class = ExtractedInfoSerializer
+def dashboard(request, pk=None):
+    extractes = ExtractedInfo.objects.all()
+    extracted_info = ""
+    if request.method == "POST":
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Call the API class to process the uploaded file
+            api_view = FileUploadView()
+            response = api_view.post(request)
 
-    def get(self, request, pk):
-        file = UploadedFile.objects.get(pk=pk)
-        file_path = file.file.name
-        file_extension = os.path.splitext(file_path)[1].lower()
+            # Pass the extracted info to the template
+            extracted_info = response.data
+            context = {"extracted_info": extracted_info, "extractes": extractes}
+            return render(request, "extractor/dashboard.html", context)
+    else:
+        form = FileUploadForm()
+        if pk is not None:
+            extracted_info = ExtractedInfo.objects.get(pk=pk)
 
-        if file_extension == ".pdf":
-            extracted_text = parse_pdf(file_path)
-        elif file_extension == ".pptx":
-            extracted_text = parse_pptx(file_path)
-        else:
-            raise ValueError("Unsupported file format")
+    context = {"form": form, "extracted_info": extracted_info, "extractes": extractes}
+    return render(request, "extractor/dashboard.html", context)
 
-        file = UploadedFile.objects.get(file=file_path)
-        extracted_info = ExtractedInfo.objects.create(file=file, content=extracted_text)
-        serializer = self.serializer_class(extracted_info)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class ParsePitchDeckView(ListView):
-    model = UploadedFile
-    context_object_name = "files"
-    ordering = ["-uploaded_at"]
-    paginate_by = 5
-    template_name = "uploadedfile_list.html"
-
-
-class ParsePitchDeckDetailView(DetailView):
-    model = ExtractedInfo
-    context_object_name = "file"
