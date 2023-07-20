@@ -1,5 +1,3 @@
-import io
-import os
 import PyPDF2
 from pptx import Presentation
 

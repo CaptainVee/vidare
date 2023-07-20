@@ -4,7 +4,7 @@
 
 <div class="container">
 	<div class="row">
-		<h1>Pitch Deck Dashboard</h1>
+		<h2>Pitch Deck Dashboard</h2>
 
 		<main class="col">
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -20,47 +20,38 @@
 				</div>
 			  </div>
 			  
+			  <h2 class="pt-3 pb-2 mb-3">File Content</h2>
+			  {% if extracted_info %}
+			  
+			  
+			  <div class="container">
 			<div class="row">
-				<!-- <div class="col-sm-4 mb-3">
-					<div class="card bg-info">
+				<div class="col-sm-4 mb-3">
+					<div class="card">
 						<div class="card-body">
-							<h5 class="card-title">Word count</h5>
-							<p class="card-text">${{ total_revenue|floatformat:"-2g" }}</p>
+							<h5 class="card-title">File Name</h5>
+							<p class="card-text">{{  extracted_info.get_name }}</p>
 							
 						</div>
 					</div>
 				</div>
 				<div class="col-sm-4 mb-3">
-					<div class="card bg-success">
-						<div class="card-body">
+					<div class="card">
+						<div class="card-body bg-success">
 							<h5 class="card-title">File size</h5>
-							<p class="card-text">{{total_enrollment}}</p>
+							<p class="card-text">{{ extracted_info.get_file_size }}</p>
 						</div>
 					</div>
 				</div>
-				<div class="col-sm-4 mb-3">
-					<div class="card bg-danger">
-						<div class="card-body">
-							<h5 class="card-title">Categorry</h5>
-							<div class="rating mb-2">
-								<span class="reviews">(Reviews)</span>
-							</div>
-						</div>
-					</div>
-				</div> -->
 
-				<h2 class="pt-3 pb-2 mb-3 border-bottom">File Content</h2>
-				<div class="container">
-					<!-- course header start -->
-					{% if extracted_info %}
-                    {{ extracted_info.content }}
+				{{ extracted_info.content }}
 					{% else %}
 					<canvas class="my-4 w-100" id="myChart" width="900" height="100"></canvas>
 					<h3>No content to display please upload a document</h3>
 					{% endif %}
 				</div>
 
-				<h2 class="pt-3 pb-2 mb-3">Extracted - ({{ extracted.count }})</h2>
+				<h5 class="pt-3 pb-2 mb-3">Extracted - ({{ extracted.count }})</h5>
 				<div class="container">
 					<!-- course header start -->
 					<div class="table-responsive">
