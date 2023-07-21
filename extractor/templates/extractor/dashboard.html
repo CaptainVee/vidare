@@ -1,5 +1,6 @@
 
 {% extends "extractor/base.html" %}
+{% load ptag %}
 {% block content %}
 
 <div class="container">
@@ -8,19 +9,22 @@
 
 		<main class="col">
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				{% if form %}
 				<h6>Upload your file</h6>
 				<div class="btn-toolbar mb-2 mb-md-0">
-				  <div class="btn-group me-2">
-					<form method="post" enctype="multipart/form-data">
-						{% csrf_token %}
-						{{ form }}
-						<button type="submit" class="btn btn-sm btn-outline-secondary">Upload</button>
-					</form>
-				  </div>
+					<div class="btn-group me-2">
+						<form method="post" enctype="multipart/form-data">
+							{% csrf_token %}
+							{{ form }}
+							<button type="submit" class="btn btn-sm btn-outline-secondary">Upload</button>
+						</form>
+					</div>
 				</div>
+				{% else %}
+				<a  class="btn btn-sm btn-outline-secondary"href="{% url 'dashboard' %}">Back to Home</a>
+				{% endif %}
 			  </div>
 			  
-			  <h2 class="pt-3 pb-2 mb-3">File Content</h2>
 			  {% if extracted_info %}
 			  
 			  
@@ -30,7 +34,7 @@
 					<div class="card">
 						<div class="card-body">
 							<h5 class="card-title">File Name</h5>
-							<p class="card-text">{{  extracted_info.get_name }}</p>
+							<p class="card-text">{{  extracted_info.get_name}}</p>
 							
 						</div>
 					</div>
@@ -42,16 +46,24 @@
 							<p class="card-text">{{ extracted_info.get_file_size }}</p>
 						</div>
 					</div>
+				</div>				
+				<div class="col-sm-4 mb-3">
+					<div class="card">
+						<div class="card-body bg-secondary">
+							<h5 class="card-title">Pages</h5>
+							<p class="card-text">{{ extracted_info.no_of_pages }} Pages</p>
+						</div>
+					</div>
 				</div>
-
-				{{ extracted_info.content }}
+				<h3 class="text-primary">Title: {{ extracted_info.title }}</h3>
+				
+				{{ extracted_info.content|paragraphs|safe }}
 					{% else %}
-					<canvas class="my-4 w-100" id="myChart" width="900" height="100"></canvas>
-					<h3>No content to display please upload a document</h3>
+					<h3 width="900" height="100">No content to display please upload a document</h3>
 					{% endif %}
 				</div>
 
-				<h5 class="pt-3 pb-2 mb-3">Extracted - ({{ extracted.count }})</h5>
+				<h5 class="pt-3 pb-2 mb-3">Extracted - ({{ extractes.count }})</h5>
 				<div class="container">
 					<!-- course header start -->
 					<div class="table-responsive">
@@ -61,8 +73,8 @@
 									<th scope="col">#</th>
 									<th scope="col">Name</th>
 									<th scope="col">File size</th>
-									<th scope="col">Header</th>
-									<th scope="col">Header</th>
+									<th scope="col">File type</th>
+									<th scope="col">Pages</th>
 								</tr>
 							</thead>
 							{% for extract in extractes %}
@@ -71,8 +83,8 @@
 							<td>{{ extract.pk }}</td>
 							<td><a href="{% url 'dashboard2' extract.pk %}">{{ extract.get_name }}</a></td>
 							<td>{{ extract.get_file_size }}</td>
-							<td>information</td>
-							<td>text</td>
+							<td>{{ extract.file.get_file_type }}</td>
+							<td>{{ extract.no_of_pages }}</td>
 						  </tr>
 						</tbody>
 						{% endfor %}

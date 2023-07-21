@@ -28,17 +28,23 @@ class FileUploadView(APIView):
                 extracted_text = parse_pptx(file_path)
             else:
                 raise ValueError("Unsupported file format")
+            print(extracted_text)
 
             extracted_info = ExtractedInfo.objects.create(
-                file=file, content=extracted_text
+                file=file,
+                title=extracted_text.get("Title", ""),
+                content=extracted_text.get("Content", ""),
+                no_of_pages=extracted_text.get("no_of_pages", ""),
             )
             serializer = ExtractedInfoSerializer(extracted_info)
+            # serializer["file"] =extracted_info.file
+            # serializer[]
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def dashboard(request, pk=None):
+def dashboard(request):
     extractes = ExtractedInfo.objects.all()
     extracted_info = ""
     if request.method == "POST":
@@ -50,12 +56,12 @@ def dashboard(request, pk=None):
 
             # Pass the extracted info to the template
             extracted_info = response.data
-            context = {"extracted_info": extracted_info, "extractes": extractes}
-            return render(request, "extractor/dashboard.html", context)
-    else:
-        form = FileUploadForm()
-        if pk is not None:
-            extracted_info = ExtractedInfo.objects.get(pk=pk)
-
+    form = FileUploadForm()
     context = {"form": form, "extracted_info": extracted_info, "extractes": extractes}
+    return render(request, "extractor/dashboard.html", context)
+
+def dashboard2(request, pk):
+    extractes = ExtractedInfo.objects.all()
+    extracted_info = ExtractedInfo.objects.get(pk=pk)
+    context = {"extracted_info": extracted_info, "extractes": extractes}
     return render(request, "extractor/dashboard.html", context)

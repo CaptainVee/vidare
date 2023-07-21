@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 # Create your models here.
@@ -13,17 +14,26 @@ class UploadedFile(models.Model):
     def __str__(self) -> str:
         return self.file.name
 
+    @property
+    def get_file_type(self) -> str:
+        file_extension = os.path.splitext(self.file.name)[1].lower()
+        if file_extension == '.pdf':
+            return 'PDF'
+        elif file_extension == '.pptx':
+            return 'PPTX'
+
 
 class ExtractedInfo(models.Model):
     file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
-    slide_title = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
     content = models.TextField()
     metadata = models.JSONField(blank=True, null=True)
+    no_of_pages = models.IntegerField(null=True, blank=True)
     extracted_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def get_name(self):
-        return self.file.file.name
+        return os.path.basename(self.file.file.name)
 
     @property
     def get_file_size(self):
